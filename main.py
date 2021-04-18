@@ -1,10 +1,10 @@
 #part 2 number 2:
 
-#import numpy as np
+
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
-import sys
+from sklearn.naive_bayes import MultinomialNB
 
 #load into a numpy array and print shape
 import pandas as pd
@@ -58,4 +58,36 @@ print(x.shape)
 X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.25, random_state=42)
 
 
+#part 5: apply basic technique
+#how many categories the other features have and use the average of that. -- for bins for #wealth.worth in billions
+# col1Count = df['name'].nunique()
+# col2Count = df['rank'].nunique()
+# col3Count = df['year'].nunique()
+# col4Count = df['company.founded'].nunique()
+# col5Count = df['company.name'].nunique()
+# col6Count = df['company.relationship'].nunique()
+# col7Count = df['company.sector'].nunique()
+# col8Count = df['company.type'].nunique()
+# col9Count = df['demographics.age'].nunique()
+# col10Count = df['demographics.gender'].nunique()
+# col11Count = df['location.citizenship'].nunique()
+# col12Count = df['location.country code'].nunique()
+# col13Count = df['location.region'].nunique()
+# col14Count = df['wealth.type'].nunique()
+# col15Count = df['wealth.how.category'].nunique()
+# col16Count = df['wealth.how.from emerging'].nunique()
+# col17Count = df['wealth.how.industry'].nunique()
+# col18Count = df['wealth.how.inherited'].nunique()
+# col19Count = df['wealth.how.was founder'].nunique()
+# col20Count = df['wealth.how.was political'].nunique()
+# col20Count = df['location.gdp'].nunique()
+#
+# print(col1Count)
+print(col2Count)
 
+
+
+
+# nb_classifier = MultinomialNB()
+# y_prediction = nb_classifier.fit(X_train, y_train).predict(X_test)
+# print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0], (y_test != y_prediction).sum()))
