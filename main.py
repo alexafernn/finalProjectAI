@@ -62,7 +62,9 @@ x_df = df.drop('wealth.how.inherited', axis=1)
 x = x_df.to_numpy()
 
 # Random state = 'none' so that we get the same results
-X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.25, random_state=None)
+X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.25, random_state=42)
+#(From email I sent you not sure if this is the right approach instead:
+# X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.25,shuffle=false, random_state=none)
 
 #First Technique:
 #Multinomial Naive Bayes Classifier
