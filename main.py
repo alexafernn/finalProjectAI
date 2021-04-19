@@ -1,25 +1,26 @@
-#part 2 number 2:
+#Partners: Alexandra Fernandez & Amanda Condron
+#Final Project: Part 2
 
-
+#Import statements
 import numpy as np
 import sys
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.naive_bayes import MultinomialNB
+from sklearn.ensemble import ExtraTreesClassifier
 
-#load into a numpy array and print shape
+#Loading csv into a pandas dataframe
 import pandas as pd
 df = pd.read_csv("billionaires.csv", sep=",")
 
-
-#Part4:  your input or output features are categorical and represented as strings,
-# some models my require you to re-encode them as integers. In this case, add the line
-# from sklearn.preprocessing import LabelEncoder to the top of your Python file to import the label encoder.
-# Refer to the documentation and fit and apply a label encoder to each column of the data as needed.
-# You should apply this transformation before your test/train split in Item 3.
-
-#columns we need to change from string
+#For testing: to display all the columns in terminal
 pd.set_option("display.max_rows", None, "display.max_columns", None)
+
+#Printing first three rows to verify dataframe looks correct
+print("First three rows:")
+print(df.head(3))
+
+#Utilizing label encoder to re-encode all our strings as integers
 le = LabelEncoder()
 df['demographics.age'] = df['demographics.age'].abs()
 df['name'] = le.fit_transform(df['name'])
@@ -39,81 +40,54 @@ df['wealth.how.inherited'] = le.fit_transform(df['wealth.how.inherited'].astype(
 df['wealth.how.was founder'] = le.fit_transform(df['wealth.how.was founder'].astype(str))
 df['wealth.how.was political'] = le.fit_transform(df['wealth.how.was political'].astype(str))
 
-# rounding to nearest billion for wealth.worth in billions
+#Rounding to nearest billion for wealth.worth in billions
 df['wealth.worth in billions'] = df['wealth.worth in billions'].apply(lambda x: round(x, 0))
 df['wealth.worth in billions'] = df['wealth.worth in billions'].astype(int)
 
+#Rounding to the nearest integer for location gdp
 df['location.gdp'] = df['location.gdp'].apply(lambda x: round(x, 0))
 df['v'] = df['location.gdp'].astype(int)
 
-print(df.head(15))
-# print(df.dtypes)
-
-
+#Turning the Dataframe into a numpy array
 numpy_array = df.to_numpy()
-# print(numpy_array)
-print(numpy_array.shape)
+print("numpy array shape = ", numpy_array.shape)
+
+
+#For testing to see all the values in numpy array in terminal
 np.set_printoptions(threshold=sys.maxsize)
-print(numpy_array>=0)
 
-#if you are applying supervised learning, split your data into input features X and output Y
-print("about to print y aka outputs")
+#Splitting our data into input features X and output Y
 y = numpy_array[:,19]
-# print(y)
-print(y.shape)
-
-print("about to print x aka input")
 x_df = df.drop('wealth.how.inherited', axis=1)
 x = x_df.to_numpy()
-print(x.shape)
 
-#Part 3: Split your data into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.25, random_state=42)
+# Random state = 'none' so that we get the same results
+X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.25, random_state=None)
 
-print("printing shapes")
-print(X_train.shape)
-print(X_test.shape)
-print(y_train.shape)
-print(y_test.shape)
-
-#part 5: apply basic technique
-#how many categories the other features have and use the average of that. -- for bins for #wealth.worth in billions
-# col1Count = df['name'].nunique()
-# col2Count = df['rank'].nunique()
-# col3Count = df['year'].nunique()
-# col4Count = df['company.founded'].nunique()
-# col5Count = df['company.name'].nunique()
-# col6Count = df['company.relationship'].nunique()
-# col7Count = df['company.sector'].nunique()
-# col8Count = df['company.type'].nunique()
-# col9Count = df['demographics.age'].nunique()
-# col10Count = df['demographics.gender'].nunique()
-# col11Count = df['location.citizenship'].nunique()
-# col12Count = df['location.country code'].nunique()
-# col13Count = df['location.region'].nunique()
-# col14Count = df['wealth.type'].nunique()
-# col15Count = df['wealth.how.category'].nunique()
-# col16Count = df['wealth.how.from emerging'].nunique()
-# col17Count = df['wealth.how.industry'].nunique()
-# col18Count = df['wealth.how.inherited'].nunique()
-# col19Count = df['wealth.how.was founder'].nunique()
-# col20Count = df['wealth.how.was political'].nunique()
-# col20Count = df['location.gdp'].nunique()
-#
-# print(col1Count)
-# print(col2Count)
-
-
-
-
-# nb_classifier = MultinomialNB()
-# y_prediction = nb_classifier.fit(X_train, y_train).predict(X_test)
-# print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0], (y_test != y_prediction).sum()))
-
-#part 5:
+#First Technique:
+#Multinomial Naive Bayes Classifier
 nb_classifier = MultinomialNB(alpha=1.0, fit_prior=True, class_prior=None)
 nb_classifier.fit(X_train, y_train)
-print("mean accuracy on given train data and labels", nb_classifier.score(X_train,y_train))
-print("mean accuracy on give test data and labels", nb_classifier.score(X_test,y_test))
+print("The mean accuracy on the given training data and labels", nb_classifier.score(X_train,y_train))
+print("The mean accuracy on the given test data and labels", nb_classifier.score(X_test,y_test))
 
-#
+#Second Technique:
+#First Using Extra Trees Classifier to see the importance of the features
+model = ExtraTreesClassifier(n_estimators=10)
+model.fit(X_train, y_train)
+#print("The importance of each feature: ", model.feature_importances_)
+
+#Dropping all columns with a value of ~0.02 or less
+df = df.drop(columns=["year", "company.type", "location.gdp", "wealth.how.was political","company.relationship","location.citizenship","location.country code","location.region","wealth.type"])
+new_numpy_array = df.to_numpy()
+
+#Splitting our data into new input features x2
+x_df2 = df.drop('wealth.how.inherited', axis=1)
+x2 = x_df2.to_numpy()
+
+#Splitting the data into training and testing datasets
+X_train2, X_test2, y_train2, y_test2 = train_test_split(x2, y, test_size=0.25, random_state=42)
+nb_classifier = MultinomialNB(alpha=1.0, fit_prior=True, class_prior=None)
+nb_classifier.fit(X_train2, y_train2)
+print("The mean accuracy on the given training data and labels after feature selection", nb_classifier.score(X_train2,y_train2))
+print("The mean accuracy on the give test data and labels after feature selection", nb_classifier.score(X_test2,y_test2))
