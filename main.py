@@ -8,6 +8,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.ensemble import ExtraTreesClassifier
+from sklearn.model_selection import GridSearchCV
 
 #Loading csv into a pandas dataframe
 import pandas as pd
@@ -63,8 +64,6 @@ x = x_df.to_numpy()
 
 # Random state = 'none' so that we get the same results
 X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.25, random_state=42)
-#(From email I sent you not sure if this is the right approach instead:
-# X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.25,shuffle=false, random_state=none)
 
 #First Technique:
 #Multinomial Naive Bayes Classifier
@@ -72,6 +71,21 @@ nb_classifier = MultinomialNB(alpha=1.0, fit_prior=True, class_prior=None)
 nb_classifier.fit(X_train, y_train)
 print("The mean accuracy on the given training data and labels", nb_classifier.score(X_train,y_train))
 print("The mean accuracy on the given test data and labels", nb_classifier.score(X_test,y_test))
+
+#Part 3 for the First Technique
+#parameter_grid dictionary
+nb_param_grid_all_featurues = {'alpha': (1, 0.1, 0.01, 0.001, 0.0001, 0.00001), 'fit_prior': (True, False), 'class_prior':([None])}
+
+#GridSearchCV object for the First Technique
+nb_search_all_features = GridSearchCV(nb_classifier, nb_param_grid_all_featurues, cv= 5)
+nb_search_all_features.fit(X_train, y_train)
+print("Best Score for First Technique:", nb_search_all_features.best_score_)
+print("Best Params for First Technique:", nb_search_all_features.best_params_)
+
+#Using the obtained hyperparameter values to fit and score our basic model on our testing data.
+nb_classifier_optimal = MultinomialNB(alpha=0.01, fit_prior=True, class_prior=None)
+nb_classifier_optimal.fit(X_train, y_train)
+print("The mean accuracy on the given test data and labels (using optimal parameters)", nb_classifier_optimal.score(X_test,y_test))
 
 #Second Technique:
 #First Using Extra Trees Classifier to see the importance of the features
@@ -93,3 +107,18 @@ nb_classifier = MultinomialNB(alpha=1.0, fit_prior=True, class_prior=None)
 nb_classifier.fit(X_train2, y_train2)
 print("The mean accuracy on the given training data and labels after feature selection", nb_classifier.score(X_train2,y_train2))
 print("The mean accuracy on the give test data and labels after feature selection", nb_classifier.score(X_test2,y_test2))
+
+#Part 3:
+#parameter_grid dictionary
+nb_param_grid_select_featurues = {'alpha': (1, 0.1, 0.01, 0.001, 0.0001, 0.00001), 'fit_prior': (True, False), 'class_prior':([None])}
+
+#GridSearchCV object for the basic method
+nb_search_select_features = GridSearchCV(nb_classifier, nb_param_grid_all_featurues, cv= 5)
+nb_search_select_features.fit(X_train2, y_train2)
+print("Best Score for Second Technique:", nb_search_select_features.best_score_)
+print("Best Params for Second Technique:", nb_search_select_features.best_params_)
+
+#Using the obtained hyperparameter values to fit and score our advanced model on our testing data.
+nb_classifier_optimal2 = MultinomialNB(alpha=0.01, fit_prior=True, class_prior=None)
+nb_classifier_optimal2.fit(X_train2, y_train2)
+print("The mean accuracy on the given test data and labels (using optimal parameters)", nb_classifier_optimal2.score(X_test2,y_test2))
